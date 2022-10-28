@@ -8,6 +8,7 @@ import time
 import math
 
 IMU1 = imubridge._383_unit('/dev/ttyUSB0')
+#IMU1 = imubridge._383_unit('COM3')
 
 pub_id = 0
 
