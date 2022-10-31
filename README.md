@@ -1,2 +1,2 @@
 # IMU
-For imu383ZA (in UART mode) 
+For imu383ZA with USB adapter(in UART mode) 
