@@ -11,12 +11,14 @@ gps_data = []
 while 1:
     IMU1.run()
     GPS1.run()
-    if IMU1.trigger:
+    if IMU1.trigger: #if triggered, than update the imu data
         imu_data = IMU1.imu_data
 
-    if GPS1.trigger:
-        gps_data =  GPS1.GPS_data
+    if GPS1.trigger:#if triggered, than update the GPS data
+        gps_data =  GPS1.GPS_data #because the GPS freq. is the lowset, so use it as the ref freq.
         print(gps_data)
         print(imu_data)
+
+    #to-do make it into rosnode msg
 
     

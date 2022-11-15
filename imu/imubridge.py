@@ -112,7 +112,7 @@ class _383_unit():
 				self.imu_data = [acc,rate,quat,temp,temp_b,self.timestamp,Bitstate]
 
 				
-				self.shift_mean_frq = (1/(timer-self.imu_frq_timer)*1000000)
+				#self.shift_mean_frq = (1/(timer-self.imu_frq_timer)*1000000)
 				self.imu_frq_timer = timer
 				self.second_header = False
 				self.first_header = False
