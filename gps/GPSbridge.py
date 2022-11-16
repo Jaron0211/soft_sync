@@ -20,6 +20,8 @@ class _GPS_unit():
 
         self._buff_msg = ''
         self.find_header = False
+        self.frequence_timer = time.time()
+        self.freq = 0
 
     # def read_serial(self):
 
@@ -48,6 +50,9 @@ class _GPS_unit():
                 self.find_header = False
                 self._buff_msg = ''
                 self.trigger = True
+                self.freq = 1/(time.time() - self.frequence_timer + 0.00001)
+                self.frequence_timer = time.time()
+
 
        
 if __name__ == "__main__":
@@ -56,5 +61,6 @@ if __name__ == "__main__":
     while 1:
         GPS.run()
         if GPS.trigger:
+            print(GPS.freq)
             print(GPS.GPS_data)
 
