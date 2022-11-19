@@ -148,8 +148,7 @@ if "__main__" == __name__:
 		IMU1.run()
 
 		if IMU1.trigger:
-			
-			#self.imu_data = [acc,rate,quat,temp,temp_b,self.timestamp,Bitstate]
+
 			data = IMU1.imu_data
 			output = (
 				"ACC_X: %4f ACC_Y: %4f ACC_Z: %4f"%(data[0][0],data[0][1],data[0][2]),

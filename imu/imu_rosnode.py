@@ -7,8 +7,8 @@ import imubridge
 import time
 import math
 
-IMU1 = imubridge._383_unit('/dev/ttyUSB0')
-#IMU1 = imubridge._383_unit('COM3')
+#IMU1 = imubridge._383_unit('/dev/ttyUSB0')
+IMU1 = imubridge._383_unit('COM5')
 
 pub_id = 0
 
@@ -18,7 +18,7 @@ def IMU():
     rospy.init_node('IMU1', anonymous=True)
     rate = rospy.Rate(100)
     while not rospy.is_shutdown():
-        IMU1.pose_info()
+        IMU1.run()
         if IMU1.trigger:
 
             imu_header = Header()
@@ -54,7 +54,6 @@ def IMU():
 
 if __name__ == '__main__':
     try:
-        
         IMU()
         
     except rospy.ROSInterruptException:
