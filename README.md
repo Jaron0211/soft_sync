@@ -17,3 +17,5 @@ Simple UART lib(NMEA format), the driver file is ./gps/GPSbridge.py
 ROS.lnk file is the example shortcut file that run cmd with the ROS environment.
 hardware_soft_sync.py do the hardware level sychonization, 
 soft_sync.py run with ROS, it's for Synchronize every ROS node data.(ref. paper: /cites/A_Soft_Time_Synchronization_Framework_for_Multi-Sensors_in_Autonomous_Localization_and_Navigation.pdf)
+
+#### Any questions please contact me by email: jaron0211@gmail.com
