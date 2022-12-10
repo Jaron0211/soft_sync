@@ -9,6 +9,8 @@ import time
 import os
 import sys
 
+import socket 
+
 rospy.init_node("IMUs_receiver", anonymous=True, disable_signals=False)
 ti = time.time
 
@@ -17,12 +19,12 @@ class imu_receiver(Thread):
     def __init__(self,node_name):
         Thread.__init__(self)
         self.node_name = node_name
-        self.imu_data = []
+        self.imu_data = Imu();
         self.freq_timer = ti()
         self.freq = 0
         self.sample_num = 0
         self.trigger = False
-        self.trigger_times = []
+        self.trigger_times = [time.time()]
         self.trigger_add = self.trigger_times.append
 
     def callback(self,data):
@@ -37,7 +39,10 @@ class imu_receiver(Thread):
     
     def run(self):
         self.listener()
+        while 1:
+            self.trigger = False;
 
+loop_timer = time.time();
 
 if __name__ == '__main__':
     IMUs = []
@@ -45,10 +50,14 @@ if __name__ == '__main__':
         IMUs.append(imu_receiver('IMU_POSE_%d'%i))
     
     [x.start() for x in IMUs]
+    print(time.time() - loop_timer)
 
     while 1:
-        [print("{}: {}  ".format(u.node_name,(u.freq))) for u in IMUs]
-        [sys.stdout.write("\033[F") for u in IMUs]
-        #time.sleep(0.1)
-        
+        [print("{}: {}  ".format(u.node_name,((u.trigger_times[-1])))) for u in IMUs]
+
+        #[sys.stdout.write("\033[F") for u in IMUs]
+        #for u in IMUs:
+            #if u.trigger == True:
+                #print("{} has triggered! ".format(u.node_name))
+
         
