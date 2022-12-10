@@ -19,7 +19,7 @@ gps_trigger = False
 class threading_gps(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.GPS1 = gpslib._GPS_unit("COM6")
+        self.GPS1 = gpslib._GPS_unit("COM4")
         self.GPS_sample_time = time.time()
     
     def run(self):
@@ -31,14 +31,14 @@ class threading_gps(threading.Thread):
                 gps_data = self.GPS1.GPS_data
 
 gps = threading_gps()
-
-loop_timer = time.time()
 gps.start()
 
-while 1:
-    IMU1.run()
+loop_timer = time.time()
 
-    if (gps.GPS1.trigger):
+while 1:
+    IMU1.run() # in main loop, get newest IMU data
+
+    if (gps.GPS1.trigger): #Threading, if receive GPS data, will trigger onec.
         os.system('cls')
         print("IMU data: ")
         data = IMU1.imu_data
@@ -52,9 +52,9 @@ while 1:
 				"Bitstate: %d"%data[6],
 				"frequence: %2f"%IMU1.shift_mean_frq
 				)
-        for i in output:
-            print(i)
-        #print("IMU freq: ",IMU1.shift_mean_frq)
+
+        [print(i) for i in output]
+        
         print()
         print("GPS data: ")
         for i in gps_data:
