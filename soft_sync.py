@@ -65,6 +65,8 @@ if __name__ == '__main__':
             print("the sample target: {}".format(sample_target))
             timing_fit = True
             sample_tracker = IMUs[sample_target].trigger_times[-1]
+            loop_timer = time.time()
+            total_sample = 0;
 
 
         if timing_fit:
