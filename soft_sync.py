@@ -93,4 +93,6 @@ if __name__ == '__main__':
                     x.header.stamp.nsecs = int(publish_time*1000 % 1000)
                     
                 [P.publish(I) for P,I in zip(PUBs,RIMU_data)]
-                [print(x) for x in RIMU_data]
+                print("Publish sec: {}, nsec: {}".format(int(publish_time),int(publish_time*1000 % 1000)))
+                #[print(x.orientation,'\n',"=================") for x in RIMU_data]
+                #os.system('clear')
