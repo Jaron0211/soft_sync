@@ -11,7 +11,8 @@ import sys
 
 import socket 
 
-rospy.init_node("IMUs_receiver", anonymous=True, disable_signals=False)
+rospy.init_node("Synchronization_Node", anonymous=True, disable_signals=False)
+rate = rospy.Rate(100)
 ti = time.time
 
 timing_fit = False;
@@ -47,38 +48,50 @@ class imu_receiver(Thread):
         while 1:
             self.trigger = False;
 
+class sync_imu_publisher():
+    def __init__(self,Node_name):
+        self.publisher = rospy.Publisher(Node_name, Imu, queue_size=10)
+    
+    def publish(self,IMU_data):
+        self.publisher.publish(IMU_data)
+        
+        
+
 if __name__ == '__main__':
     IMUs = []
+    PUBs = []
     for i in range(5):
         IMUs.append(imu_receiver('IMU_POSE_%d'%i))
+        PUBs.append(sync_imu_publisher("Sync_imu_%d"%i))
     
     [x.start() for x in IMUs]
-    sample_tracker = time.time()
+    
 
-    loop_timer = time.time()
-    total_sample = 0;
-
+    start_timer = 0
+    print('init')
     while 1:
-        if not timing_fit and (False in [x.init for x in IMUs]):
+        if not timing_fit and not(False in [x.init for x in IMUs]):
             trigger_timing = [x.trigger_times for x in IMUs]
             sample_target = int(trigger_timing.index(max(trigger_timing)))
             print("the sample target: {}".format(sample_target))
             timing_fit = True
             sample_tracker = IMUs[sample_target].trigger_times[-1]
-            loop_timer = time.time()
-            total_sample = 0;
+            start_timer = time.time()
 
 
         if timing_fit:
             target_timer = IMUs[sample_target].trigger_times[-1]
             if  target_timer != sample_tracker:
+                #os.system('clear')
                 
                 sample_tracker = target_timer
-                total_sample += 1
-                #[print("{}".format(x.imu_data)) for x in IMUs]
-                print(total_sample/(time.time() - loop_timer))
-            else:
-                print("not got sample")
-            #[print("{}: {}  ".format(u.node_name,((u.trigger_times[-1])))) for u in IMUs]
 
-        
+                publish_time = time.time() - start_timer
+
+                RIMU_data = [x.imu_data for x in IMUs]
+                for x in RIMU_data:
+                    x.header.stamp.secs = int(publish_time)
+                    x.header.stamp.nsecs = int(publish_time*1000 % 1000)
+                    
+                [P.publish(I) for P,I in zip(PUBs,RIMU_data)]
+                [print(x) for x in RIMU_data]

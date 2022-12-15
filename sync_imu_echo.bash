@@ -1,0 +1,6 @@
+gnome-terminal --tab -- 'bash -c rostopic echo /Sync_imu_0 -c;exec bash'
+gnome-terminal --tab -- 'bash -c rostopic echo /Sync_imu_1 -c;exec bash'
+gnome-terminal --tab -- 'bash -c rostopic echo /Sync_imu_2 -c;exec bash'
+gnome-terminal --tab -- 'bash -c rostopic echo /Sync_imu_3 -c;exec bash'
+gnome-terminal --tab -- 'bash -c rostopic echo /Sync_imu_4 -c;exec bash'
+gnome-terminal --tab -- 'bash -c rostopic echo /Sync_imu_5 -c;exec bash'
