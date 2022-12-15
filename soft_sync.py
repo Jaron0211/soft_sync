@@ -82,8 +82,7 @@ if __name__ == '__main__':
         if timing_fit:
             target_timer = IMUs[sample_target].trigger_times[-1]
             if  target_timer != sample_tracker:
-                #os.system('clear')
-                
+
                 sample_tracker = target_timer
 
                 publish_time = time.time() - start_timer
