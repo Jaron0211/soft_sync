@@ -60,23 +60,33 @@ class sync_imu_publisher():
 if __name__ == '__main__':
     IMUs = []
     PUBs = []
+    trigger_timing = []
     for i in range(5):
         IMUs.append(imu_receiver('IMU_POSE_%d'%i))
         PUBs.append(sync_imu_publisher("Sync_imu_%d"%i))
+        trigger_timing.append(time.time())
     
     [x.start() for x in IMUs]
     
 
     start_timer = 0
+    trigger_timing_buff = []
     print('init')
     while 1:
-        if not timing_fit and not(False in [x.init for x in IMUs]):
-            trigger_timing = [x.trigger_times for x in IMUs]
-            sample_target = int(trigger_timing.index(max(trigger_timing)))
-            print("the sample target: {}".format(sample_target))
-            timing_fit = True
-            sample_tracker = IMUs[sample_target].trigger_times[-1]
-            start_timer = time.time()
+        
+        if not timing_fit :
+            trigger_timing = [x.trigger_times[-1] for x in IMUs]
+            if not(False in [x.init for x in IMUs]):    
+                sample_target = int(trigger_timing.index(max(trigger_timing)))
+                print("the sample target: {}".format(sample_target))
+                timing_fit = True
+                sample_tracker = IMUs[sample_target].trigger_times[-1]
+                start_timer = time.time()
+            
+            if trigger_timing != trigger_timing_buff:
+                print(trigger_timing)
+                print()
+                trigger_timing_buff = trigger_timing
 
 
         if timing_fit:
@@ -93,5 +103,5 @@ if __name__ == '__main__':
                     x.header.stamp.nsecs = int(publish_time*1000 % 1000)
                     
                 [P.publish(I) for P,I in zip(PUBs,RIMU_data)]
-                print("Publish sec: {}, nsec: {}".format(int(publish_time),int(publish_time*1000 % 1000)))
-                sys.stdout.flush()
+                #print("Publish sec: {}, nsec: {}".format(int(publish_time),int(publish_time*1000 % 1000)))
+                #sys.stdout.flush()
