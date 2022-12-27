@@ -6,14 +6,10 @@ from sensor_msgs.msg import Imu
 
 from threading import Thread
 import time
-import os
-import sys
-
-import socket 
-
 rospy.init_node("Software_Synchronization_Node", anonymous=True, disable_signals=False)
-rate = rospy.Rate(101)
 ti = time.time
+
+thread_break = False
 
 timing_fit = False
 sample_target = 0
@@ -40,9 +36,7 @@ class imu_receiver(Thread):
         self.trigger_add = self.trigger_times.append
 
     def callback(self,data):
-        if self.trigger:
-            global target_timer
-            target_timer = ti()
+        global target_timer
 
         self.init = True
         self.imu_data = data
@@ -55,24 +49,25 @@ class imu_receiver(Thread):
             self.freq_timer = ti()
             self.sample_num += 1
 
-        self.trigger_add(ti())
         self.trigger_time = ti()
-
+        self.trigger_add(self.trigger_time)
         
+        if self.trigger:
+            target_timer = 1
+     
     def listener(self):
         rospy.Subscriber(self.node_name, Imu, self.callback)
-        rospy.spin()
+        #rospy.spin()
     
     def run(self):
         self.listener()
 
 class sync_imu_publisher():
     def __init__(self,Node_name):
-        self.publisher = rospy.Publisher(Node_name, Imu, queue_size=10)
-    
+        self.publisher = rospy.Publisher(Node_name, Imu, queue_size=1)
+
     def publish(self,IMU_data):
         self.publisher.publish(IMU_data)
-        
         
 
 if __name__ == '__main__':
@@ -85,10 +80,7 @@ if __name__ == '__main__':
         PUBs.append(sync_imu_publisher("Sync_imu_%d"%i))
         trigger_timing.append(ti())
     
-    [x.start() for x in IMUs]
-
-    def t():
-        [P.publish(I) for P,I in zip(PUBs,RIMU_data)]
+    [x.start() and x.join() for x in IMUs]
 
     start_timer = 0
     trigger_timing_buff = []
@@ -98,7 +90,7 @@ if __name__ == '__main__':
     while 1:
         if not freq_fit :
             setup_time = ti() - freq_timer
-            if setup_time > 15:
+            if setup_time > 5:
                 print()
                 print("Done.")
                 freq_array = [x.freq for x in IMUs] #Read the last sample time
@@ -113,12 +105,14 @@ if __name__ == '__main__':
 
                     freq_fit = True
                     timing_fit = True
+
+                    IMUs[sample_target].stop()
                 else:
                     print("The Frequency is likely, Use timing to fit")
                     freq_fit = True
                     timing_fit = False
             else:
-                print("Caculating the frequency: {}".format(15 - int(setup_time)) )
+                print("Caculating the frequency: {}  ".format(15 - int(setup_time)),end='\r')
 
         elif not timing_fit :
             trigger_timing = [x.trigger_times[-1] for x in IMUs] #Read the last sample time
@@ -126,25 +120,19 @@ if __name__ == '__main__':
                 sample_target = int(trigger_timing.index(max(trigger_timing))) #find last imu data line
                 print("the sample target: {}".format(sample_target))
                 timing_fit = True
-                sample_tracker = IMUs[sample_target].trigger_times[-1]
                 IMUs[sample_target].trigger = True
                 start_timer = ti()
-
         else:
-            RIMU_data = [x.imu_data for x in IMUs]
+            if ti() - target_timer >= 0.010:
+                RIMU_data = [x.imu_data for x in IMUs]
 
-            if  target_timer != sample_tracker:
                 publish_time =  ti() - start_timer
-                p_secs = int(publish_time)
-                p_nsecs = int(publish_time*1000 % 1000)
+                p_secs, p_nsecs = int(publish_time), int(publish_time*1000 % 1000)
 
-                
                 for x in RIMU_data:
-                    x.header.stamp.secs = p_secs
-                    x.header.stamp.nsecs = p_nsecs
+                    x.header.stamp.secs, x.header.stamp.nsecs = p_secs, p_nsecs
 
-                Thread(target = t).start()
-                sample_tracker = target_timer
-                #print("Publish sec: {}, nsec: {}".format(int(publish_time),int(publish_time*1000 % 1000)),end='\r')
-            else:
-                target_timer = IMUs[sample_target].trigger_time
+                [P.publish(I) for P,I in zip(PUBs,RIMU_data)]
+                target_timer = ti()
+        
+    thread_break = True
