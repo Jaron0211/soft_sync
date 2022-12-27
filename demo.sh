@@ -4,7 +4,7 @@ gnome-terminal --window -e 'bash -c "sleep 0s ; roscore"' \
 --tab -e 'bash -c "sleep 3s ; rosbag play imu/IMUbag/IMU_2.bag"' \
 --tab -e 'bash -c "sleep 3s ; rosbag play imu/IMUbag/IMU_3.bag"' \
 --tab -e 'bash -c "sleep 0s ; rosbag play imu/IMUbag/IMU_4.bag"'
-gnome-terminal --window -e 'bash -c "sleep 3s ; python3 ./soft_sync.py;exec bash"' \
+gnome-terminal --window -e 'bash -c "sleep 3s ; python3 ./soft_sync.py ;exec bash"' \
 --tab --title='imu_1_hz' -e 'bash -c "sleep 3s ; rostopic hz /Sync_imu_1"' \
 --tab --title='imu_2_hz' -e 'bash -c "sleep 3s ; rostopic hz /Sync_imu_2"' \
 --tab --title='imu_3_hz' -e 'bash -c "sleep 3s ; rostopic hz /Sync_imu_3"' \
