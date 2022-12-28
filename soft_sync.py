@@ -25,15 +25,6 @@ p_secs, p_nsecs = 0,0
 
 sync_switch = False
 
-def switch():
-    global sync_switch
-    while 1:
-        char = getche()
-        if char == 'c':
-            sync_switch = not sync_switch
-
-Thread(target = switch).start()
-
 #Threading for IMU Reading by rostopic
 class imu_receiver():
     def __init__(self,node_id):
