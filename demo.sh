@@ -16,5 +16,5 @@ gnome-terminal --window --title='imu_0' -e 'bash -c "rostopic echo /Sync_imu_0 -
 --tab --title='imu_3' -e 'bash -c "rostopic echo /Sync_imu_3 -c"' \
 --tab --title='imu_4' -e 'bash -c "rostopic echo /Sync_imu_4 -c"'
 gnome-terminal --window --title='recoeder_1' -e 'bash -c "sleep 10s ; python3 ./ros_timeline_recorder.py"'
-gnome-terminal --window --title='recoeder_2' -e 'bash -c "sleep 10s ; python3 ./ros_timeline_recorder_with_while.py"'
+#gnome-terminal --window --title='recoeder_2' -e 'bash -c "sleep 10s ; python3 ./ros_timeline_recorder_with_while.py"'
 gnome-terminal --window --title='visualizer' -e 'bash -c "sleep 15s ; python3 ./ros_timeline_visualization.py ;exec bash"'

@@ -25,7 +25,7 @@ class imu_recorder():
         rospy.Subscriber(self.node_name, Imu, self.callback)
 
     def callback(self,data):
-        self.imu_data = data
+        #self.imu_data = data
         timestamp = ti() - start_time
 
         self.timestamps.append(timestamp)

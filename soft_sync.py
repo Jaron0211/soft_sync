@@ -1,6 +1,8 @@
 #use rosbag to simulate 6 imu input at same time
 #the .\fake_mutil_imu.bat
 
+import pandas as pd
+
 import rospy
 from sensor_msgs.msg import Imu
 
@@ -23,6 +25,7 @@ sample_tracker = 0
 
 p_secs, p_nsecs = 0,0
 
+timmimg_array = []
 
 #Threading for IMU Reading by rostopic
 class imu_receiver():
@@ -47,7 +50,7 @@ class imu_receiver():
         rospy.Subscriber(self.node_name, Imu, self.callback)
 
         #publisher
-        self.publisher = rospy.Publisher('Sync_imu_%d'%node_id, Imu, queue_size=10)
+        self.publisher = rospy.Publisher('Sync_imu_%d'%node_id, Imu, queue_size=3)
         self.pub = self.publisher.publish
 
 
@@ -62,20 +65,15 @@ class imu_receiver():
         buff_ = self.imu_data.header.stamp
         buff_.secs, buff_.nsecs = int(self.publish_time), int(self.publish_time*1000 % 1000)
 
-        if self.freq_init:
-            self.sample_num += 1
-            self.freq = round(self.sample_num/(ti()-self.freq_timer),2)
-        else:
-            self.freq_init = True
-            self.freq_timer = ti()
-            self.sample_num += 1
+        self.sample_num += 1
+        if not self.freq_init: self.freq_init = True; self.freq_timer = ti()
 
         self.trigger_time = ti()
         self.trigger_add(self.trigger_time)
 
         if self.publisher_target:
             global IMUs
-            if ti() - self.last_pub > 0.005: [I.sync_publisher() for I in IMUs]; self.last_pub = ti()
+            [I.sync_publisher() for I in IMUs]; self.last_pub = ti(); timmimg_array.append([I.trigger_time for I in IMUs])
 
     def sync_publisher(self):
         self.pub(self.imu_data)
@@ -92,32 +90,33 @@ trigger_timing_buff = []
 print('init')
 freq_timer = ti()
 
-while 1:
+for iter in range(5):
     if not freq_fit :
         setup_time = ti() - freq_timer
-        if setup_time > 10:
-            print()
-            print("Done.")
-            freq_array = [x.freq for x in IMUs] #Read the last sample time
-            print(freq_array)
-            if max(freq_array) - min(freq_array) > 5:
-                sample_target = int(freq_array.index(min(freq_array))) #find last imu data line
+        time.sleep(5)
+        print()
+        print("Done.")
 
-                print("the freq sample target: {}".format(sample_target))
+        freq_array = [round(x.sample_num/(ti()-x.freq_timer),2) for x in IMUs] #Read the last sample time
+        print(freq_array)
+        if max(freq_array) - min(freq_array) > 1:
+            sample_target = int(freq_array.index(min(freq_array))) #find last imu data line
 
-                IMUs[sample_target].publisher_target = True
+            print("the freq sample target: {}".format(sample_target))
 
-                start_timer = ti()
-                for I in IMUs:
-                    I.start_timer = start_timer
+            IMUs[sample_target].publisher_target = True
 
-                freq_fit = True
-                timing_fit = True
+            start_timer = ti()
+            for I in IMUs:
+                I.start_timer = start_timer
 
-            else:
-                print("The Frequency is likely, Use timing to fit")
-                freq_fit = True
-                timing_fit = False
+            freq_fit = True
+            timing_fit = True
+
+        else:
+            print("The Frequency is likely, Use timing to fit")
+            freq_fit = True
+            timing_fit = False
         #else:
             #print("Caculating the frequency: {}  ".format(5 - int(setup_time)),end='\r')
 
@@ -127,7 +126,7 @@ while 1:
             #trigger_timing = [x.trigger_times[-1] for x in IMUs] #Read the last sample time
             #sample_target = int(trigger_timing.index(max(trigger_timing))) #find last imu data line
             IMUs_buffer = [X.trigger_times for X in IMUs]
-            minimun_time = 0
+            minimun_time = 100
             sample_target = 0
 
             for I_1_num in range(len(IMUs_buffer)):
@@ -146,12 +145,12 @@ while 1:
                     for tt in range(len(this_error_sequence)):
                         if this_error_sequence[tt] < 0 :
                             error_array.append(this_error_sequence[tt-1])
-                            print(this_error_sequence[tt-2],this_error_sequence[tt-1],this_error_sequence[tt])
+                            #print(this_error_sequence[tt-2],this_error_sequence[tt-1],this_error_sequence[tt])
                             break
-                
+                print(error_array)
                 the_error_sum = sum(error_array)
                 print("{}'s error time: {}, error array: {}".format(I_1_num,the_error_sum,error_array))
-                if the_error_sum > minimun_time:
+                if the_error_sum < minimun_time:
                     sample_target = I_1_num
                     minimun_time = the_error_sum
 
@@ -160,7 +159,15 @@ while 1:
             timing_fit = True
             IMUs[sample_target].publisher_target = True
             start_timer = ti()
-    else:
-        break
+            break
+        else:
+            break
+
+while 1:
+    time.sleep(1)
+    try:
+        pd.DataFrame(timmimg_array).to_csv('log.csv')
+    except:
+        continue
 
 rospy.spin()
