@@ -1,11 +1,6 @@
 #use rosbag to simulate 6 imu input at same time
 #the .\fake_mutil_imu.bat
 
-try:
-    from getch import getch, getche         # Linux
-except ImportError:
-    from msvcrt import getch, getche        #windows
-
 import rospy
 from sensor_msgs.msg import Imu
 
