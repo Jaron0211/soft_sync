@@ -23,7 +23,6 @@ sample_tracker = 0
 
 p_secs, p_nsecs = 0,0
 
-sync_switch = False
 
 #Threading for IMU Reading by rostopic
 class imu_receiver():
@@ -42,7 +41,8 @@ class imu_receiver():
         self.trigger_time = ti()
         self.trigger_add = self.trigger_times.append
         self.start_timer = ti()
-
+        self.last_pub = ti()
+        
         #subscriber
         rospy.Subscriber(self.node_name, Imu, self.callback)
 
@@ -71,13 +71,11 @@ class imu_receiver():
             self.sample_num += 1
 
         self.trigger_time = ti()
+        self.trigger_add(self.trigger_time)
 
-        if sync_switch:
-            if self.publisher_target:
-                global IMUs
-                [I.sync_publisher() for I in IMUs]
-        else:
-            self.sync_publisher()
+        if self.publisher_target:
+            global IMUs
+            if ti() - self.last_pub > 0.005: [I.sync_publisher() for I in IMUs]; self.last_pub = ti()
 
     def sync_publisher(self):
         self.pub(self.imu_data)
@@ -97,13 +95,14 @@ freq_timer = ti()
 while 1:
     if not freq_fit :
         setup_time = ti() - freq_timer
-        if setup_time > 5:
+        if setup_time > 10:
             print()
             print("Done.")
             freq_array = [x.freq for x in IMUs] #Read the last sample time
             print(freq_array)
             if max(freq_array) - min(freq_array) > 5:
                 sample_target = int(freq_array.index(min(freq_array))) #find last imu data line
+
                 print("the freq sample target: {}".format(sample_target))
 
                 IMUs[sample_target].publisher_target = True
@@ -124,8 +123,39 @@ while 1:
 
     elif not timing_fit :
         if not(False in [x.init for x in IMUs]):    #if there was no empty imu data
-            trigger_timing = [x.trigger_times[-1] for x in IMUs] #Read the last sample time
-            sample_target = int(trigger_timing.index(max(trigger_timing))) #find last imu data line
+
+            #trigger_timing = [x.trigger_times[-1] for x in IMUs] #Read the last sample time
+            #sample_target = int(trigger_timing.index(max(trigger_timing))) #find last imu data line
+            IMUs_buffer = [X.trigger_times for X in IMUs]
+            minimun_time = 0
+            sample_target = 0
+
+            for I_1_num in range(len(IMUs_buffer)):
+                #print("o1",I_1_num)
+                I_1 = IMUs_buffer[I_1_num]
+
+                m1_point = I_1[-20]
+                error_array = []
+
+                for I_2_num in range(len(IMUs_buffer)):
+                    #print("o2",I_2_num)
+
+                    I_2 = IMUs_buffer[I_2_num]
+                    this_error_sequence = [m1_point - T for T in I_2]
+                    #print(this_error_sequence)
+                    for tt in range(len(this_error_sequence)):
+                        if this_error_sequence[tt] < 0 :
+                            error_array.append(this_error_sequence[tt-1])
+                            print(this_error_sequence[tt-2],this_error_sequence[tt-1],this_error_sequence[tt])
+                            break
+                
+                the_error_sum = sum(error_array)
+                print("{}'s error time: {}, error array: {}".format(I_1_num,the_error_sum,error_array))
+                if the_error_sum > minimun_time:
+                    sample_target = I_1_num
+                    minimun_time = the_error_sum
+
+
             print("the sample target: {}".format(sample_target))
             timing_fit = True
             IMUs[sample_target].publisher_target = True
