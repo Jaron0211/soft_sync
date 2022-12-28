@@ -119,8 +119,8 @@ while 1:
                 print("The Frequency is likely, Use timing to fit")
                 freq_fit = True
                 timing_fit = False
-        else:
-            print("Caculating the frequency: {}  ".format(5 - int(setup_time)),end='\r')
+        #else:
+            #print("Caculating the frequency: {}  ".format(5 - int(setup_time)),end='\r')
 
     elif not timing_fit :
         trigger_timing = [x.trigger_times[-1] for x in IMUs] #Read the last sample time
