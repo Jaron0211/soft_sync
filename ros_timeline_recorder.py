@@ -8,6 +8,7 @@ import time
 
 print('init')
 rospy.init_node("Recoder_Node", anonymous=True)
+rospy.Rate(100)
 ti = time.time
 
 start_time = ti()
@@ -20,6 +21,7 @@ class imu_recorder():
         self.timestamps = []
         self.fire_time = 0
         self.got_first = False
+        self.add = self.timestamps.append
 
         #subscriber
         rospy.Subscriber(self.node_name, Imu, self.callback)
@@ -28,7 +30,7 @@ class imu_recorder():
         #self.imu_data = data
         timestamp = ti() - start_time
 
-        self.timestamps.append(timestamp)
+        self.add(timestamp)
 
 IMUs = []
 for i in range(5):

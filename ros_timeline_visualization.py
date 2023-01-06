@@ -32,6 +32,8 @@ if __name__ == '__main__':
         plt.ylabel("Sensor Topic")   
         plt.title("Synchronized")
 
+        plt.tight_layout()
+
     with open('sample.csv', 'r') as f:
         reader = pd.read_csv(f)
         plt.figure('Time error')
