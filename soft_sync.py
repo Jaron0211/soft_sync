@@ -9,6 +9,8 @@ from sensor_msgs.msg import Imu
 from threading import Thread, Lock
 import time
 
+from pympler.asizeof import asizeof
+
 rospy.init_node("Software_Synchronization_Node", anonymous=True)
 
 ti = time.time
@@ -77,6 +79,7 @@ class imu_receiver():
 
     def sync_publisher(self):
         self.pub(self.imu_data)
+        #print(asizeof(self.imu_data))
 
 IMUs = []
 trigger_timing = []

@@ -74,10 +74,11 @@ class _383_unit():
 		if self.first_header and self.second_header:
 			_type = self.ser.read(size = 2)
 			_length = self.ser.read(size = 1)
-			
+
 			if _type == b'S1':
 
 				sensor_data = self.ser.read(size = ord(_length))
+				
 				try:
 					acc = [ #g
 						unsigned_to_signed((sensor_data[0]<<8) + sensor_data[1])*(20/2**16), 
@@ -102,15 +103,16 @@ class _383_unit():
 					timer  = ((sensor_data[20]<<8) + sensor_data[21])*(15.259022) #uS
 					
 					time_delta = timer - self.imu_frq_timer
+					
 					if time_delta >= 0:
 						self.timestamp += time_delta
 					else:
 						self.timestamp += (1000000+time_delta)
 
 
-					Bitstate = ((sensor_data[21]<<8) + sensor_data[22])
+					BITstatus = (sensor_data[22]<<8 + sensor_data[23])
 												
-					self.imu_data = [acc,rate,quat,temp,temp_b,self.timestamp,Bitstate]
+					self.imu_data = [acc,rate,quat,temp,temp_b,self.timestamp,BITstatus]
 
 					self.shift_mean_frq = (1/(timer-self.imu_frq_timer+0.00001)*1000000)
 					self.imu_frq_timer = timer
@@ -143,7 +145,7 @@ class _383_unit():
 
 
 if "__main__" == __name__:
-	IMU1 = _383_unit('COM5')
+	IMU1 = _383_unit('/dev/ttyUSB0')
 
 	while(1):
 		IMU1.run()
@@ -162,8 +164,8 @@ if "__main__" == __name__:
 				"frequence: %2f"%IMU1.shift_mean_frq
 				)
 			
-			print(output)
-			print("frequence: %2f"%IMU1.shift_mean_frq)
-			print("timer: %.4f"%(IMU1.imu_data[5]/1000000))
+			#print(output)
+			#print("frequence: %2f"%IMU1.shift_mean_frq)
+			#print("timer: %.4f"%(IMU1.imu_data[5]/1000000))
 			#sys.stdout.flush()
 			#os.system('cls')

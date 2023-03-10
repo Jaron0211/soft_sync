@@ -28,9 +28,9 @@ class imu_recorder():
 
     def callback(self,data):
         #self.imu_data = data
-        timestamp = ti() - start_time
+        #timestamp = ti() - start_time
 
-        self.add(timestamp)
+        self.add(ti())
 
 IMUs = []
 for i in range(5):
@@ -44,7 +44,7 @@ time.sleep(5)
 save_data = pd.DataFrame([])
 columns = []
 for i in range(len(IMUs)):
-    buff_ = pd.DataFrame(IMUs[i].timestamps)
+    buff_ = pd.DataFrame([ tt - start_time for tt in IMUs[i].timestamps])
     save_data = pd.concat([save_data,buff_],ignore_index=True,axis = 1)
     columns.append(IMUs[i].node_name)
 
