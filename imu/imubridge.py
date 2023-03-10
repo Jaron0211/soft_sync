@@ -60,6 +60,8 @@ class _383_unit():
 		self.first_header = False
 		self.second_header = False
 		self.trigger = False
+
+		self.raw_data = ''
 	
 	def R2Q(self,roll, pitch, yaw):
 
@@ -122,6 +124,7 @@ class _383_unit():
 				self.first_header = False
 				self.trigger = True
 
+				self.raw_data = sensor_data
 				self.ser.flush()
 			else:
 				self.second_header = False
@@ -131,11 +134,9 @@ class _383_unit():
 			self.trigger = False
 			_buf = self.ser.read(size = 1)
 			if (_buf) == b'U' and not self.first_header:
-				#print("header1!")
 				self.first_header = True
 			
 			elif (_buf) == b'U' and self.first_header:
-				#print("header2!")
 				self.second_header = True
 			
 			else:
