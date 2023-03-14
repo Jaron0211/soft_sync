@@ -8,7 +8,7 @@ Simple UART lib(NMEA format)
 ### This project is test on Windows 10 ,ROS noetic(u can find the ROS installation on the ROS official website http://wiki.ros.org/Installation/Windows), Also test on Ubuntu 20
 
 ### IMU
-# note: On Ubuntu, can run the demo.sh instand.
+note: On Ubuntu, can run the demo.sh instand.
 For imu383ZA with USB adapter(in UART mode), the driver file is ./imu/imubridge.py
 to emulate multi-imu inputs, we use rosbag to log the sensor info, and play all 5 file simultaneously.
 
