@@ -24,6 +24,16 @@ class _GPS_unit():
         self.frequence_timer = time.time()
         self.freq = 0
 
+        self.gps_time = 0
+        self.status = 0
+        self.latitude = 0
+        self.latitude_hemisphere = 0
+        self.longitude = 0
+        self.longitude_hemisphere = 0
+        self.speed = 0
+        self.course = 0
+        self.date = 0
+
     # def read_serial(self):
 
     #     _buff = self.ser.readlines()
@@ -48,11 +58,58 @@ class _GPS_unit():
                     self._buff_msg += _buff.decode('ASCII')
             else:
                 self.GPS_data = self._buff_msg.split('\r\n')[:-1]
+                self.NMEA_GPRMC(self.GPS_data)
                 self.find_header = False
                 self._buff_msg = ''
                 self.trigger = True
                 self.freq = 1/(time.time() - self.frequence_timer + 0.00001)
                 self.frequence_timer = time.time()
+    
+    def NMEA_GPRMC(self, msg):
+        if len(msg) < 12 or msg[0] != "$GPRMC":
+            self.gps_time = 0
+            self.status = 0
+            self.latitude = 0
+            self.latitude_hemisphere = 0
+            self.longitude = 0
+            self.longitude_hemisphere = 0
+            self.speed = 0
+            self.course = 0
+            self.date = 0
+
+        # Extract relevant fields
+        time = msg[1]
+        status = msg[2]
+        latitude = msg[3]
+        latitude_hemisphere = msg[4]
+        longitude = msg[5]
+        longitude_hemisphere = msg[6]
+        speed = msg[7]
+        course = msg[8]
+        date = msg[9]
+
+        # Check if the GPS fix is valid
+        if status != "A":
+            return None
+
+        # Convert latitude and longitude from NMEA format to decimal degrees
+        latitude_degrees = float(latitude[:2]) + float(latitude[2:]) / 60
+        if latitude_hemisphere == "S":
+            latitude_degrees = -latitude_degrees
+
+        longitude_degrees = float(longitude[:3]) + float(longitude[3:]) / 60
+        if longitude_hemisphere == "W":
+            longitude_degrees = -longitude_degrees
+
+        self.gps_time = msg[1]
+        self.status = msg[2]
+        self.latitude = latitude_degrees
+        self.latitude_hemisphere = msg[4]
+        self.longitude = longitude_degrees
+        self.longitude_hemisphere = msg[6]
+        self.speed = msg[7]
+        self.course = msg[8]
+        self.date = msg[9]
 
 
        

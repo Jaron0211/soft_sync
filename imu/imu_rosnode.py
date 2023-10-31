@@ -15,7 +15,7 @@ pub_id = 0
 def IMU(id):
     global pub_id
     pub = rospy.Publisher('IMU_POSE_%d'%id, Imu, queue_size=1)
-    rospy.init_node('IMU1', anonymous=True)
+    rospy.init_node('IMU%d'%id, anonymous=True)
     rate = rospy.Rate(100)
     while 1:
         if rospy.is_shutdown():
