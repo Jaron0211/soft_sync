@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import rospy
 from std_msgs.msg import Header
-from sensor_msgs.msg import NavSatFix
+from sensor_msgs.msg import NavSatFix, NavSatStatus
 
 import GPSbridge
 import time
@@ -34,9 +34,13 @@ def GPS(id, rate):
            
             #http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html
             msg = NavSatFix()
+
+            gps_status = NavSatStatus()
+            gps_status.status = 0
+            gps_status.status = 1
             
             msg.header = GPS_header
-            msg.status = str(GPS1.status)
+            msg.status = gps_status
             msg.latitude = GPS1.latitude
             msg.longitude = GPS1.longitude
             msg.altitude = float('nan')
