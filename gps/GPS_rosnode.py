@@ -26,8 +26,8 @@ def GPS(id, rate):
             GPS_header = Header()
             GPS_header.seq = pub_id
 
-            time_secs = int(GPS1.gps_time/1000000)
-            time_nsesc = int(GPS1.gps_time/1000)%1000
+            time_secs = int(int(GPS1.gps_time)/1000000)
+            time_nsesc = int(int(GPS1.gps_time)/1000)%1000
 
             GPS_header.stamp.secs ,GPS_header.stamp.nsecs = time_secs, time_nsesc
             GPS_header.frame_id = "gps_frame"
