@@ -25,7 +25,7 @@ class _GPS_unit():
         self.freq = 0
 
         self.gps_time = 0
-        self.status = 0
+        self.status = ""
         self.latitude = 0
         self.latitude_hemisphere = 0
         self.longitude = 0
