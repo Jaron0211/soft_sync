@@ -36,7 +36,7 @@ def GPS(id, rate):
             msg = NavSatFix()
             
             msg.header = GPS_header
-            msg.status = GPS1.status
+            msg.status = str(GPS1.status)
             msg.latitude = GPS1.latitude
             msg.longitude = GPS1.longitude
             msg.altitude = float('nan')

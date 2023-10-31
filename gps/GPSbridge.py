@@ -103,7 +103,7 @@ class _GPS_unit():
             longitude_degrees = -longitude_degrees
 
         self.gps_time = msg[1]
-        self.status = msg[2]
+        self.status = str(msg[2])
         self.latitude = latitude_degrees
         self.latitude_hemisphere = msg[4]
         self.longitude = longitude_degrees
