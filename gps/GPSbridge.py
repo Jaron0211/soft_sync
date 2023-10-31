@@ -76,6 +76,7 @@ class _GPS_unit():
             self.speed = 0
             self.course = 0
             self.date = 0
+            return
 
         # Extract relevant fields
         time = msg[1]
