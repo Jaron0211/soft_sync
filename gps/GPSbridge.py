@@ -66,7 +66,7 @@ class _GPS_unit():
                 self.frequence_timer = time.time()
     
     def NMEA_GPRMC(self, msg):
-        if len(msg) < 12 or msg[0] != "$GPRMC":
+        if len(msg) < 12 or msg[0] != "GPRMC":
             self.gps_time = 0
             self.status = ""
             self.latitude = 0
