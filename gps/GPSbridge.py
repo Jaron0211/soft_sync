@@ -68,7 +68,7 @@ class _GPS_unit():
     def NMEA_GPRMC(self, msg):
         if len(msg) < 12 or msg[0] != "$GPRMC":
             self.gps_time = 0
-            self.status = 0
+            self.status = ""
             self.latitude = 0
             self.latitude_hemisphere = 0
             self.longitude = 0
@@ -80,7 +80,7 @@ class _GPS_unit():
 
         # Extract relevant fields
         time = msg[1]
-        status = msg[2]
+        status = str(msg[2])
         latitude = msg[3]
         latitude_hemisphere = msg[4]
         longitude = msg[5]
