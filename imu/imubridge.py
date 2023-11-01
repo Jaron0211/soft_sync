@@ -173,7 +173,7 @@ if "__main__" == __name__:
 				"frequence: %2f"%IMU1.shift_mean_frq
 				)
 			
-			#print(output)
+			print(output)
 			#print("frequence: %2f"%IMU1.shift_mean_frq)
 			#print("timer: %.4f"%(IMU1.imu_data[5]/1000000))
 			#sys.stdout.flush()
