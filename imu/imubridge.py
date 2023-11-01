@@ -7,6 +7,9 @@ import serial
 import numpy as np
 import time
 
+from datetime import timezone 
+import datetime 
+
 imu_trigger = False
 frq_timer = time.time()
 
@@ -48,6 +51,7 @@ class _383_unit():
 
 		self.ser.open()
 		
+		self.received_timestamp = 0
 		self._header_buffer = []
 		self._buffer = []
 		self.header_check = False
@@ -152,9 +156,13 @@ if "__main__" == __name__:
 		IMU1.run()
 
 		if IMU1.trigger:
-
+			dt = datetime.datetime.now(timezone.utc) 
+  
+			utc_time = dt.replace(tzinfo=timezone.utc) 
+			utc_timestamp = utc_time.timestamp() 
 			data = IMU1.imu_data
 			output = (
+				"System_timestamp: %8f" %utc_timestamp,
 				"ACC_X: %4f ACC_Y: %4f ACC_Z: %4f"%(data[0][0],data[0][1],data[0][2]),
 				"q_X: %4f q_Y: %4f q_Z: %4f q_W: %4f"%(data[2][0],data[2][1],data[2][2],data[2][3]),
 				"GYRO_X: %4f GYRO_Y: %4f GYRO_Z: %4f"%(data[1][0],data[1][1],data[1][2]),

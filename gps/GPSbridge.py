@@ -24,15 +24,40 @@ class _GPS_unit():
         self.frequence_timer = time.time()
         self.freq = 0
 
-        self.gps_time = 0
+        #GPRMC
+        self.UTC_hhmmss = 0
         self.status = ""
         self.latitude = 0
-        self.latitude_hemisphere = 0
+        self.latitude_hemisphere = 'N'
         self.longitude = 0
-        self.longitude_hemisphere = 0
-        self.speed = 0
-        self.course = 0
+        self.longitude_hemisphere = 'E'
+        #self.gs_mile = 0
+        #self.TN_heading = 0
+        self.UTC_ddmmyy = 0
+        self.Mag_dec = 0
+        self.Mag_dec_dir = 'E'
         self.date = 0
+        self.mode_indicate = 'N'
+
+        #GPVTG
+        self.TN_heading = 0
+        self.MN_heading = 0
+        self.gs_mile = 0
+        self.gs_km = 0
+        #self.mode_indicate = 0
+
+        #GPGGA
+        #self.gps_time = 0
+        #self.latitude = 0
+        #self.latitude_hemisphere = 'N'
+        #self.longitude = 0
+        #self.longitude_hemisphere = 'E'
+        self.GGA_mode_indicate = 0
+        self.sat_num = 0
+        self.HDOP = 99.9
+        self.sea_alt = -9999.9
+       
+
 
     # def read_serial(self):
 
@@ -58,14 +83,26 @@ class _GPS_unit():
                     self._buff_msg += _buff.decode('ASCII')
             else:
                 self.GPS_data = self._buff_msg.split('\r\n')[:-1]
-                self.NMEA_GPRMC(self.GPS_data)
+                self.NMEA(self.GPS_data)
                 self.find_header = False
                 self._buff_msg = ''
                 self.trigger = True
                 self.freq = 1/(time.time() - self.frequence_timer + 0.00001)
                 self.frequence_timer = time.time()
-    
-    def NMEA_GPRMC(self, msgs):
+    #Gps module output example
+    '''
+    [
+        'GPRMC,103402.00,A,2259.73871,N,12013.40902,E,0.037,,011123,,,D*7D', 
+        'GPVTG,,T,,M,0.037,N,0.069,K,D*2D', 
+        'GPGGA,103402.00,2259.73871,N,12013.40902,E,2,10,0.75,27.4,M,17.2,M,,0137*60', 
+        'GPGSA,A,3,28,31,16,18,27,26,03,04,08,09,,,1.39,0.75,1.18*02', 
+        'GPGSV,3,1,12,03,06,234,21,04,50,293,36,08,40,213,38,09,22,313,31*7A', 
+        'GPGSV,3,2,12,16,51,001,40,18,10,064,30,21,03,186,24,26,38,038,38*72', 
+        'GPGSV,3,3,12,27,81,178,42,28,26,110,37,31,46,091,38,50,62,163,37*76', 
+        'GPGLL,2259.73871,N,12013.40902,E,103402.00,A,D*60'
+    ]
+    '''
+    def NMEA(self, msgs):
         print(msgs)
         for mes in msgs:
             msg = mes.split(',')
