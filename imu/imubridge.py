@@ -65,6 +65,9 @@ class _383_unit():
 		self.second_header = False
 		self.trigger = False
 
+		self.first_msg = True
+		self.aligned_timer = time.time()
+
 		self.raw_data = ''
 	
 	def R2Q(self,roll, pitch, yaw):
@@ -78,6 +81,11 @@ class _383_unit():
 	def run(self):
 		global frq_timer
 		if self.first_header and self.second_header:
+
+			if self.first_msg:
+				self.aligned_timer = int(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000000)
+				self.first_msg = False
+
 			_type = self.ser.read(size = 2)
 			_length = self.ser.read(size = 1)
 
@@ -118,7 +126,7 @@ class _383_unit():
 
 					BITstatus = (sensor_data[22]<<8 + sensor_data[23])
 												
-					self.imu_data = [acc,rate,quat,temp,temp_b,self.timestamp,BITstatus]
+					self.imu_data = [acc,rate,quat,temp,temp_b,self.aligned_timer + self.timestamp,BITstatus]
 
 					self.shift_mean_frq = (1/(timer-self.imu_frq_timer+0.00001)*1000000)
 					self.imu_frq_timer = timer
