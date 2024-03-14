@@ -16,7 +16,7 @@ def IMU(id):
     global pub_id
     pub = rospy.Publisher('IMU_POSE_%d'%id, Imu, queue_size=1)
     rospy.init_node('IMU%d'%id, anonymous=True)
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(200)
     while 1:
         if rospy.is_shutdown():
             break
@@ -26,25 +26,26 @@ def IMU(id):
             imu_header = Header()
             imu_header.seq = pub_id
 
-            time_secs = int(IMU1.timestamp/1000000)
-            time_nsesc = int(IMU1.timestamp/1000)%1000
-
-            imu_header.stamp.secs ,imu_header.stamp.nsecs = time_secs, time_nsesc
-            imu_header.frame_id = "imu_frame"
+            imu_header.stamp = rospy.Time.now()
+            imu_header.frame_id = "world"
            
             msg = Imu()
             
             msg.header = imu_header
-            # msg.orientation.x = IMU1.imu_data[2][0]
-            # msg.orientation.y = IMU1.imu_data[2][1]
-            # msg.orientation.z = IMU1.imu_data[2][2]
-            # msg.orientation.w = IMU1.imu_data[2][3]
-            ori = msg.orientation 
-            ori.x, ori.y, ori.z, ori.w = IMU1.imu_data[2][0], IMU1.imu_data[2][1], IMU1.imu_data[2][2], IMU1.imu_data[2][3]
 
-            msg.angular_velocity.x ,msg.angular_velocity.y, msg.angular_velocity.z = IMU1.imu_data[1][0], IMU1.imu_data[1][1], IMU1.imu_data[1][2]
+            msg.orientation.x = 0.0
+            msg.orientation.y = 0.0
+            msg.orientation.z = 0.0
+            msg.orientation.w = 0.0
+            msg.orientation_covariance = [99999.9, 0.0, 0.0, 0.0, 99999.9, 0.0, 0.0, 0.0, 99999.9]
 
-            msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z = IMU1.imu_data[0][0], IMU1.imu_data[0][1], IMU1.imu_data[0][2]
+            msg.angular_velocity.x ,msg.angular_velocity.y, msg.angular_velocity.z = IMU1.imu_data[1][0]*9.81, IMU1.imu_data[1][1]*9.81, IMU1.imu_data[1][2]*9.81
+            msg.angular_velocity_covariance = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+
+            msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z = IMU1.imu_data[0][0]*9.81, IMU1.imu_data[0][1]*9.81, IMU1.imu_data[0][2]*9.81
+            msg.linear_acceleration_covariance = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
             pub.publish(msg)
             
             rate.sleep()
