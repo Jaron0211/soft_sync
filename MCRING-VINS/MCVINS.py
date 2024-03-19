@@ -83,7 +83,7 @@ def IMU(id):
             pub_id+=1
 
 cam_thread = threading.Thread(taget=talker)
-imu_thread = threading.Thread(taget=IMU,0)
+imu_thread = threading.Thread(taget=IMU,args=0)
 
 if __name__ == '__main__':
     try:
