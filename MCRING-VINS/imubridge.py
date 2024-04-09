@@ -7,6 +7,7 @@ import time
 
 from datetime import timezone 
 import datetime 
+import os, sys
 
 imu_trigger = False
 frq_timer = time.time()
@@ -168,19 +169,19 @@ if "__main__" == __name__:
 			utc_timestamp = utc_time.timestamp() 
 			data = IMU1.imu_data
 			output = (
-				"System_timestamp: %8f" %utc_timestamp,
-				"ACC_X: %4f ACC_Y: %4f ACC_Z: %4f"%(data[0][0],data[0][1],data[0][2]),
-				"q_X: %4f q_Y: %4f q_Z: %4f q_W: %4f"%(data[2][0],data[2][1],data[2][2],data[2][3]),
-				"GYRO_X: %4f GYRO_Y: %4f GYRO_Z: %4f"%(data[1][0],data[1][1],data[1][2]),
-				"temp_X: %4f temp_Y: %4f temp_Z: %4f"%(data[3][0],data[3][1],data[3][2]),
-				"board temp: %4f"%data[4],
-				"timestamp: %d"%data[5],
-				"Bitstate: %d"%data[6],
-				"frequence: %2f"%IMU1.shift_mean_frq
+				#"System_timestamp: %8f" %utc_timestamp,
+				"ACC_X: %4f ACC_Y: %4f ACC_Z: %4f"%(data[0][0]*9.81,data[0][1]*-9.81,data[0][2]*9.81),
+				#"q_X: %4f q_Y: %4f q_Z: %4f q_W: %4f"%(data[2][0],data[2][1],data[2][2],data[2][3]),
+				"GYRO_X: %4f GYRO_Y: %4f GYRO_Z: %4f"%(data[1][0]*9.81,data[1][1]*-9.81,data[1][2]*9.81),
+				#"temp_X: %4f temp_Y: %4f temp_Z: %4f"%(data[3][0],data[3][1],data[3][2]),
+				#"board temp: %4f"%data[4],
+				#"timestamp: %d"%data[5],
+				#"Bitstate: %d"%data[6],
+				#"frequence: %2f"%IMU1.shift_mean_frq
 				)
-			
+			sys.stdout.flush()
+			os.system('clear')
 			print(output)
 			#print("frequence: %2f"%IMU1.shift_mean_frq)
 			#print("timer: %.4f"%(IMU1.imu_data[5]/1000000))
-			#sys.stdout.flush()
-			#os.system('cls')
+			
