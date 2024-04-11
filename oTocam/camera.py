@@ -13,8 +13,8 @@ def talker():
     cap = cv2.VideoCapture()
     cap.open('/dev/video0', apiPreference=cv2.CAP_V4L2)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('U', 'Y', 'V', 'Y'))#输出图像为MJPG格式
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)#修改图像宽度为1920
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1280)#修改图像高度为1080
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1280)
     
     while not rospy.is_shutdown():
         ret, img = cap.read()

@@ -45,7 +45,6 @@ def talker():
 def IMU(id):
     global pub_id
     pub = rospy.Publisher('IMU_POSE_%d'%id, Imu, queue_size=1)
-    rospy.init_node('IMU%d'%id, anonymous=True)
     rate = rospy.Rate(200)
     while 1:
         if rospy.is_shutdown():
@@ -82,8 +81,8 @@ def IMU(id):
 
             pub_id+=1
 
-cam_thread = threading.Thread(taget=talker)
-imu_thread = threading.Thread(taget=IMU,args=0)
+cam_thread = threading.Thread(target=talker)
+imu_thread = threading.Thread(target=IMU,args=0)
 
 if __name__ == '__main__':
     try:
